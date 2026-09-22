@@ -5,10 +5,7 @@ export default function errorMiddleWare(err, req, res, next) {
       message: err.message,
     });
   }
-  console.log({
-    message:err.message,
-    stack:err.stack
-  });
+  console.log(err);
   return res.status(500).send({
     success: false,
     message: "Internal server error",

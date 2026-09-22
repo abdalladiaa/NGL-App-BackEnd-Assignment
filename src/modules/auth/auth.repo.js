@@ -1,4 +1,4 @@
-import User from "../../DB/models/user.model.js";
+import User from "../../database/models/user.model.js";
 
 
 export async function createUser(userData) {
@@ -8,3 +8,4 @@ export async function createUser(userData) {
 export async function checkUserExistByEmail(email) {
   return await User.findOne({ email });
 }
+

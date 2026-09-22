@@ -1,4 +1,4 @@
-import User from "../../DB/models/user.model.js";
+import User from "../../database/models/user.model.js";
 
 export async function updateUserByEmail(email, updatedData) {
   return await User.findOneAndUpdate({ email }, updatedData, {

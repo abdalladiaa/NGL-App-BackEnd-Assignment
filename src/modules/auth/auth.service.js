@@ -1,4 +1,3 @@
-import AppError from "../../common/error/error.js";
 import userError from "../../common/error/userErrors/userErrors.js";
 import { sendEmail } from "../../common/mail/mail.js";
 import { verifyEmailTemplate } from "../../templates/verifyEmail.template.js";
@@ -8,6 +7,9 @@ import { toMs } from "../../utils/times/times.js";
 import * as authRepo from "./auth.repo.js";
 import * as otpRepo from "../otp/otp.repo.js";
 import * as userRepo from "../user/user.repo.js";
+import comparePassword from "../../utils/hashing/comparePassword.js";
+
+import generateToken from "../../utils/token/generateToken.js";
 
 export const register = async (userData) => {
   const userExist = await authRepo.checkUserExistByEmail(userData.email);
@@ -42,4 +44,27 @@ export const verifyAccount = async (email, code) => {
   if (user) await otpRepo.deleteOtpByEmail(user.email);
 
   return user;
+};
+
+export const login = async (email, password) => {
+  const userExist = await authRepo.checkUserExistByEmail(email);
+  if (!userExist) throw userError.userNotFound;
+
+  if (userExist.isVerified === false) throw userError.emailNotVerified();
+
+  if (!password) throw userError.passwordRequired();
+
+  const matchPassword = await comparePassword(password, userExist.password);
+  if (!matchPassword) throw userError.passwordIncorrect();
+
+  const token = generateToken(
+    userExist._id,
+    userExist.email,
+    userExist.fullName,
+  );
+
+  console.log(token);
+  
+
+  return token;
 };

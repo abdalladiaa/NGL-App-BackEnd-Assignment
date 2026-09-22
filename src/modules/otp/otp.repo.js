@@ -1,4 +1,4 @@
-import OTP from "../../DB/models/otp.model.js";
+import OTP from "../../database/models/otp.model.js";
 
 export async function createOtp(otpData) {
   return await OTP.create(otpData);
