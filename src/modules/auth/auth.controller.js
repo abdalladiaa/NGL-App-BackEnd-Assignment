@@ -16,7 +16,7 @@ export const register = async (req, res, next) => {
 };
 
 export const verifyAccount = async (req, res, next) => {
-  const { email, code } = req.body;
+  const { email, code } = req.body || {};
   try {
     const user = await authService.verifyAccount(email, code);
     res.status(200).send({
@@ -30,18 +30,30 @@ export const verifyAccount = async (req, res, next) => {
 };
 
 export const login = async (req, res, next) => {
-  const { email, password } = req.body;
+  const { email, password } = req.body || {};
   try {
     const token = await authService.login(email, password);
-    console.log(token);
-    
+
     res.cookie("access_token", token, {
       httpOnly: true,
-      maxAge: toMs(1 , 'hour')
+      maxAge: toMs(1, "hour"),
     });
     res.status(200).send({
       success: true,
       message: "user login successfully",
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const sendOtp = async (req, res, next) => {
+  const { email } = req.body || {};
+  try {
+    await authService.sendOtp(email);
+    res.status(200).send({
+      success: true,
+      message: "OTP sent successfully",
     });
   } catch (err) {
     next(err);

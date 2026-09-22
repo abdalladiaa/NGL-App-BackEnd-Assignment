@@ -17,12 +17,8 @@ export const register = async (userData) => {
   userData.password = await hashPassword(userData.password);
 
   const createdUser = await authRepo.createUser(userData);
-  const otp = generateOtp();
-  await otpRepo.createOtp({
-    email: userData.email,
-    code: otp,
-    expiresAt: Date.now() + toMs(5, "minute"),
-  });
+  const otp = await generateOtp(userData.email);
+
   sendEmail(userData.email, "Verification OTP", verifyEmailTemplate(otp));
   return createdUser;
 };
@@ -41,7 +37,7 @@ export const verifyAccount = async (email, code) => {
 
   const user = await userRepo.updateUserByEmail(email, { isVerified: true });
 
-  if (user) await otpRepo.deleteOtpByEmail(user.email);
+  if (user) await otpRepo.deleteOtpsByEmail(user.email);
 
   return user;
 };
@@ -64,7 +60,19 @@ export const login = async (email, password) => {
   );
 
   console.log(token);
-  
 
   return token;
+};
+
+export const sendOtp = async (email) => {
+  if (!email) throw userError.emailRequired();
+
+  const userExist = await authRepo.checkUserExistByEmail(email);
+  if (!userExist) throw userError.userNotFound();
+
+  await otpRepo.deleteOtpsByEmail(email);
+
+  const otp = await generateOtp(userExist.email);
+
+  await sendEmail(userExist.email, "New OTP", verifyEmailTemplate(otp));
 };
