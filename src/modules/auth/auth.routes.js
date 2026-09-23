@@ -4,7 +4,7 @@ import * as authController from "./auth.controller.js";
 const authRouter = Router();
 
 authRouter.post("/register", authController.register);
-authRouter.post("/verify-account", authController.verifyAccount);
+authRouter.patch("/verify-account", authController.verifyAccount);
 authRouter.post("/login", authController.login);
 authRouter.post("/send-otp", authController.sendOtp);
 
