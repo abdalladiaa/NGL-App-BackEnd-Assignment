@@ -7,6 +7,7 @@ import errorMiddleware from "./middlewares/error.middleware.js";
 import authRouter from "./modules/auth/auth.routes.js";
 import AppError from "./common/error/error.js";
 import { logger } from "./common/log/logger.js";
+import { PORT } from "./common/config/config.js";
 
 const app = express();
 
@@ -22,8 +23,6 @@ app.use((req, res, next) => {
 });
 
 app.use(errorMiddleware);
-
-const PORT = process.env.PORT;
 
 app.listen(PORT, () => {
   logger.info(`server is running on port ${PORT}`);

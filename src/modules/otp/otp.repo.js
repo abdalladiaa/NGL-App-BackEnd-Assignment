@@ -9,6 +9,6 @@ export async function getOtpByEmail(email) {
 }
 
 
-export async function deleteOtpsByEmail(email){
+export async function deleteOTPsByEmail(email){
   return await OTP.deleteMany({email})
 }

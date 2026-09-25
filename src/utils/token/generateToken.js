@@ -1,15 +1,9 @@
 import jwt from "jsonwebtoken";
 import { toMs } from "../times/times.js";
+import { JWT_SECRET } from "../../common/config/config.js";
 
-export default function generateToken(id, email, name) {
-  return jwt.sign(
-    {
-      id,
-      email,
-      name,
-    },
-    process.env.JWT_SECRET,
-    { expiresIn: toMs(1, "hour") },
-  );
-
+export default function generateToken(payload = {}) {
+  return jwt.sign(payload, JWT_SECRET, {
+    expiresIn: toMs(1, "hour"),
+  });
 }
