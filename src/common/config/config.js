@@ -1,3 +1,7 @@
+import dotenv from "dotenv"
+
+dotenv.config({path:[`.${process.env.NODE_ENV}.env`]})
+
 export const PORT = process.env.PORT || 5000
 export const MONGO_URI = process.env.MONGO_URI || ''
 export const EMAIL = process.env.EMAIL || ""
