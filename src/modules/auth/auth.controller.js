@@ -1,8 +1,7 @@
 import successResponse from "../../common/response/successResponse.js";
-import { toMs } from "../../utils/times/times.js";
 import decodeToken from "../../utils/token/decodeToken.js";
+import saveTokenInCookie from "../../utils/token/saveTokenInCookie.js";
 import * as authService from "./auth.service.js";
-
 
 export const register = async (req, res, next) => {
   const userData = req.body;
@@ -39,10 +38,7 @@ export const login = async (req, res, next) => {
     const token = await authService.login(email, password);
     const data = await decodeToken(token);
 
-    res.cookie("access_token", token, {
-      httpOnly: true,
-      maxAge: toMs(1, "hour"),
-    });
+    saveTokenInCookie(res, token);
     successResponse({
       res,
       message: "user login successfully",
@@ -58,6 +54,26 @@ export const sendOtp = async (req, res, next) => {
   try {
     await authService.sendOtp(email);
     successResponse({ res, status: 200, message: "OTP sent successfully" });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const loginWithGoogle = async (req, res, next) => {
+  const { idToken } = req.body;
+
+  try {
+    const token = await authService.logInWithGoogle(idToken);
+    const data = await decodeToken(token);
+    console.log(data);
+    
+    saveTokenInCookie(res, token);
+    successResponse({
+      status: 200,
+      res,
+      message: "user logged in successfully",
+      data,
+    });
   } catch (err) {
     next(err);
   }

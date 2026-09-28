@@ -10,6 +10,7 @@ import comparePassword from "../../utils/hashing/comparePassword.js";
 import generateToken from "../../utils/token/generateToken.js";
 import encryption from "../../utils/encryption/encryption.js";
 import { decryption } from "../../utils/encryption/decryption.js";
+import { verifyGoogleToken } from "../../utils/google/verifyGoogleToken.js";
 
 export const register = async (userData) => {
   const userExist = await authRepo.checkUserExistByEmail(userData.email);
@@ -78,4 +79,29 @@ export const sendOtp = async (email) => {
   const otp = await generateOtp(userExist.email);
 
   await sendEmail(userExist.email, "New OTP", verifyEmailTemplate(otp));
+};
+
+export const logInWithGoogle = async (idToken) => {
+  const payload = await verifyGoogleToken(idToken);
+
+  const userExist = await authRepo.checkUserExistByEmail(payload.email);
+  if (userExist) {
+    return generateToken({
+      id: userExist._id,
+      email: userExist.email,
+    });
+  }
+
+  const [firstName, lastName] = payload.name.split(" ");
+  const createdUser = await authRepo.createUser({
+    firstName,
+    lastName,
+    email: payload.email,
+    isVerified: true,
+    provider: "google",
+  });
+  return generateToken({
+    id: createdUser._id,
+    email: createdUser.email,
+  });
 };

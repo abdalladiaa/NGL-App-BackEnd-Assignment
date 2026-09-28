@@ -32,7 +32,12 @@ const userSchema = new mongoose.Schema(
     phone: {
       type: String,
     },
-    password: { type: String, required: true },
+    password: {
+      type: String,
+      required: function () {
+        return this.provider === "local"; 
+      },
+    },
     gender: {
       type: String,
       enum: ["male", "female", "other"],
@@ -41,6 +46,11 @@ const userSchema = new mongoose.Schema(
     isVerified: {
       type: Boolean,
       default: false,
+    },
+    provider: {
+      type: String,
+      enum: ["local", "google", "facebook"],
+      default: "local",
     },
   },
   {

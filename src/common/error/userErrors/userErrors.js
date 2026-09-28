@@ -1,6 +1,5 @@
 import AppError from "../error.js";
 
-
 const userError = {
   userAlreadyExists: () => new AppError("User already exists", 409),
 
@@ -29,6 +28,8 @@ const userError = {
   accountNotVerified: () => new AppError("Please verify your email first", 403),
 
   unauthorized: () => new AppError("Unauthorized", 401),
+
+  invalidGoogleToken: () => new AppError("Invalid Google token", 401),
 };
 
 export default userError;
