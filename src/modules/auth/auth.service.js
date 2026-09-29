@@ -11,6 +11,7 @@ import generateToken from "../../utils/token/generateToken.js";
 import encryption from "../../utils/encryption/encryption.js";
 import { decryption } from "../../utils/encryption/decryption.js";
 import { verifyGoogleToken } from "../../utils/google/verifyGoogleToken.js";
+import { ProviderEnum } from "../../common/enums/user.enum.js";
 
 export const register = async (userData) => {
   const userExist = await authRepo.checkUserExistByEmail(userData.email);
@@ -113,7 +114,7 @@ export const logInWithGoogle = async (idToken) => {
     lastName,
     email: payload.email,
     isVerified: true,
-    provider: "google",
+    provider: ProviderEnum.Google,
   });
   return generateToken({
     id: createdUser._id,

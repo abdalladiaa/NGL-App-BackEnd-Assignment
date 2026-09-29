@@ -1,6 +1,8 @@
 import { logger } from "../common/log/logger.js";
 
 export default function errorMiddleWare(err, req, res, next) {
+  console.log(err.stack);
+  
   logger.error(err.message);
   if (err.isOperational) {
     return res.status(err.statusCode).send({

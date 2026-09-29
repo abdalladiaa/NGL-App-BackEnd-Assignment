@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { GenderEnum, ProviderEnum } from "../../common/enums/user.enum.js";
 
 const userSchema = new mongoose.Schema(
   {
@@ -35,13 +36,13 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: function () {
-        return this.provider === "local"; 
+        return this.provider === ProviderEnum.Local;
       },
     },
     gender: {
       type: String,
-      enum: ["male", "female", "other"],
-      default: "other",
+      enum: GenderEnum,
+      default: GenderEnum.Other,
     },
     isVerified: {
       type: Boolean,
@@ -49,8 +50,8 @@ const userSchema = new mongoose.Schema(
     },
     provider: {
       type: String,
-      enum: ["local", "google", "facebook"],
-      default: "local",
+      enum: ProviderEnum,
+      default: ProviderEnum.Local,
     },
   },
   {

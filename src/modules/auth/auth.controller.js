@@ -20,7 +20,7 @@ export const register = async (req, res, next) => {
 
 export const verifyAccount = async (req, res, next) => {
   try {
-    const { email, code } = req.body || {};
+    const { email, code } = req.body;
     const user = await authService.verifyAccount(email, code);
     successResponse({
       res,
@@ -34,7 +34,7 @@ export const verifyAccount = async (req, res, next) => {
 
 export const login = async (req, res, next) => {
   try {
-    const { email, password } = req.body || {};
+    const { email, password } = req.body ;
     const token = await authService.login(email, password);
     const data = await decodeToken(token);
 
@@ -51,7 +51,7 @@ export const login = async (req, res, next) => {
 
 export const sendOtp = async (req, res, next) => {
   try {
-    const { email } = req.body || {};
+    const { email } = req.body ;
     await authService.sendOtp(email);
     successResponse({ res, status: 200, message: "OTP sent successfully" });
   } catch (err) {
@@ -61,7 +61,7 @@ export const sendOtp = async (req, res, next) => {
 
 export const resetPassword = async (req, res, next) => {
   try {
-    const { email, code, newPassword } = req.body || {};
+    const { email, code, newPassword } = req.body;
     await authService.resetPassword(email, code, newPassword);
     successResponse({
       res,
