@@ -81,6 +81,21 @@ export const sendOtp = async (email) => {
   await sendEmail(userExist.email, "New OTP", verifyEmailTemplate(otp));
 };
 
+export const resetPassword = async (email, code, newPassword) => {
+  const otp = await otpRepo.getOtpByEmail(email);
+  if (!otp) {
+    throw userError.otpExpired();
+  }
+  if (otp.code !== code) {
+    throw userError.invalidOtp();
+  }
+  newPassword = await hashPassword(newPassword);
+  await userRepo.updateUserByEmail(email, {
+    password: newPassword,
+  });
+  await otpRepo.deleteOTPsByEmail(email);
+};
+
 export const logInWithGoogle = async (idToken) => {
   const payload = await verifyGoogleToken(idToken);
 

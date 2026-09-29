@@ -4,8 +4,8 @@ import saveTokenInCookie from "../../utils/token/saveTokenInCookie.js";
 import * as authService from "./auth.service.js";
 
 export const register = async (req, res, next) => {
-  const userData = req.body;
   try {
+    const userData = req.body;
     const createdUser = await authService.register(userData);
     successResponse({
       res,
@@ -19,8 +19,8 @@ export const register = async (req, res, next) => {
 };
 
 export const verifyAccount = async (req, res, next) => {
-  const { email, code } = req.body || {};
   try {
+    const { email, code } = req.body || {};
     const user = await authService.verifyAccount(email, code);
     successResponse({
       res,
@@ -33,8 +33,8 @@ export const verifyAccount = async (req, res, next) => {
 };
 
 export const login = async (req, res, next) => {
-  const { email, password } = req.body || {};
   try {
+    const { email, password } = req.body || {};
     const token = await authService.login(email, password);
     const data = await decodeToken(token);
 
@@ -50,8 +50,8 @@ export const login = async (req, res, next) => {
 };
 
 export const sendOtp = async (req, res, next) => {
-  const { email } = req.body || {};
   try {
+    const { email } = req.body || {};
     await authService.sendOtp(email);
     successResponse({ res, status: 200, message: "OTP sent successfully" });
   } catch (err) {
@@ -59,14 +59,27 @@ export const sendOtp = async (req, res, next) => {
   }
 };
 
-export const loginWithGoogle = async (req, res, next) => {
-  const { idToken } = req.body;
-
+export const resetPassword = async (req, res, next) => {
   try {
+    const { email, code, newPassword } = req.body || {};
+    await authService.resetPassword(email, code, newPassword);
+    successResponse({
+      res,
+      status: 200,
+      message: "Password updated successfully",
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const loginWithGoogle = async (req, res, next) => {
+  try {
+    const { idToken } = req.body;
     const token = await authService.logInWithGoogle(idToken);
     const data = await decodeToken(token);
     console.log(data);
-    
+
     saveTokenInCookie(res, token);
     successResponse({
       status: 200,
