@@ -1,3 +1,4 @@
+import { TokenEnum } from "../../common/enums/token.enum.js";
 import successResponse from "../../common/response/successResponse.js";
 import decodeToken from "../../utils/token/decodeToken.js";
 import saveTokenInCookie from "../../utils/token/saveTokenInCookie.js";
@@ -43,6 +44,9 @@ export const login = async (req, res, next) => {
     );
 
     const user = decodeToken(accessToken);
+
+    saveTokenInCookie(res, accessToken, TokenEnum.accessToken);
+    saveTokenInCookie(res, refreshToken, TokenEnum.refreshToken);
 
     successResponse({
       res,
@@ -90,6 +94,7 @@ export const loginWithGoogle = async (req, res, next) => {
     const user = decodeToken(accessToken);
 
     saveTokenInCookie(res, accessToken);
+    saveTokenInCookie(res, refreshToken, TokenEnum.refreshToken);
 
     successResponse({
       res,

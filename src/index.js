@@ -8,6 +8,7 @@ import authRouter from "./modules/auth/auth.routes.js";
 import AppError from "./common/error/error.js";
 import { logger } from "./common/log/logger.js";
 import { PORT } from "./common/config/config.js";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
@@ -19,6 +20,8 @@ app.use(
 );
 
 app.use(express.json());
+
+app.use(cookieParser());
 
 await dbConnection();
 

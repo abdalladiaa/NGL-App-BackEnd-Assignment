@@ -9,13 +9,14 @@ import verifyToken from "../utils/token/verifyToken.js";
 export function auth(tokenType = TokenEnum.accessToken) {
   return async (req, res, next) => {
     try {
-      let token = req.headers.authorization;
-      if (!token) {
+      let accessToken = req.cookies["access_token"];
+
+      if (!accessToken) {
         next(authError.unauthorized());
       }
 
       const payload = verifyToken(
-        token,
+        accessToken,
         tokenType === TokenEnum.accessToken
           ? JWT_ACCESS_SECRET
           : JWT_REFRESH_SECRET,
