@@ -1,12 +1,24 @@
-import { email, z } from "zod";
-import { GenderEnum, ProviderEnum } from "../../common/enums/user.enum.js";
+import { z } from "zod";
+import { GenderEnum } from "../../common/enums/user.enum.js";
 
-export const registerDto = z.object({
-  email: z.email().toLowerCase().trim(),
-  firstName: z.string().min(8).max(20).trim(),
-  password: z.string().min(4).max(20).trim(),
-  gender: z.enum(GenderEnum).default(GenderEnum.Other),
-});
+export const registerDto = z
+  .object({
+    email: z.email().toLowerCase().trim(),
+    firstName: z.string().min(3).max(20).trim(),
+    lastName: z.string().min(3).max(20).trim(),
+    password: z.string().min(4).max(20).trim(),
+    confirmPassword: z.string(),
+    gender: z.enum(GenderEnum).default(GenderEnum.Other),
+  })
+  .refine(
+    (data) => {
+      return data.confirmPassword === data.password;
+    },
+    {
+      message: "confirm password must match the password. ",
+      path: ["confirmPassword"],
+    },
+  );
 
 export const verifyAccountDto = z.object({
   email: z.email().toLowerCase().trim(),

@@ -1,4 +1,4 @@
-import userError from "../../common/error/userErrors/userErrors.js";
+import userError from "../user/user.error.js";
 import { sendEmail } from "../../common/mail/mail.js";
 import { verifyEmailTemplate } from "../../templates/verifyEmail.template.js";
 import hashPassword from "../../utils/hashing/hashPassword.js";
@@ -12,6 +12,8 @@ import encryption from "../../utils/encryption/encryption.js";
 import { decryption } from "../../utils/encryption/decryption.js";
 import { verifyGoogleToken } from "../../utils/google/verifyGoogleToken.js";
 import { ProviderEnum } from "../../common/enums/user.enum.js";
+import { TokenEnum } from "../../common/enums/token.enum.js";
+import { toMs } from "../../utils/times/times.js";
 
 export const register = async (userData) => {
   const userExist = await authRepo.checkUserExistByEmail(userData.email);
@@ -21,9 +23,18 @@ export const register = async (userData) => {
   userData.phone = encryption(userData.phone);
 
   const createdUser = await authRepo.createUser(userData);
-  const otp = await generateOtp(userData.email);
+  const code = await generateOtp();
+  await otpRepo.createOtp({
+    email: userData.email,
+    code,
+    expiresAt: Date.now() + toMs(5, "minute"),
+  });
 
-  sendEmail(userData.email, "Verification OTP", verifyEmailTemplate(otp));
+  await sendEmail(
+    userData.email,
+    "Verification OTP",
+    verifyEmailTemplate(code),
+  );
   return createdUser;
 };
 
@@ -54,19 +65,34 @@ export const login = async (email, password) => {
 
   if (!password) throw userError.passwordRequired();
 
+  if (userExist.provider === ProviderEnum.Google) {
+    throw userError.googleAccount();
+  }
+
   const matchPassword = await comparePassword(password, userExist.password);
   if (!matchPassword) throw userError.passwordIncorrect();
 
   userExist.phone = decryption(userExist.phone);
 
-  const token = generateToken({
-    id: userExist._id,
-    email: userExist.email,
-    fullName: userExist.fullName,
-    phone: userExist.phone,
-  });
+  const accessToken = generateToken(
+    {
+      id: userExist._id,
+      email: userExist.email,
+      fullName: userExist.fullName,
+    },
+    TokenEnum.accessToken,
+  );
 
-  return token;
+  const refreshToken = generateToken(
+    {
+      id: userExist._id,
+      email: userExist.email,
+      fullName: userExist.fullName,
+    },
+    TokenEnum.refreshToken,
+  );
+
+  return { accessToken, refreshToken };
 };
 
 export const sendOtp = async (email) => {
@@ -75,11 +101,14 @@ export const sendOtp = async (email) => {
   const userExist = await authRepo.checkUserExistByEmail(email);
   if (!userExist) throw userError.userNotFound();
 
-  await otpRepo.deleteOTPsByEmail(email);
+  const code = await generateOtp();
+  await otpRepo.createOtp({
+    email: userExist.email,
+    code,
+    expiresAt: Date.now() + toMs(5, "minute"),
+  });
 
-  const otp = await generateOtp(userExist.email);
-
-  await sendEmail(userExist.email, "New OTP", verifyEmailTemplate(otp));
+  await sendEmail(userExist.email, "New OTP", verifyEmailTemplate(code));
 };
 
 export const resetPassword = async (email, code, newPassword) => {
@@ -102,10 +131,26 @@ export const logInWithGoogle = async (idToken) => {
 
   const userExist = await authRepo.checkUserExistByEmail(payload.email);
   if (userExist) {
-    return generateToken({
-      id: userExist._id,
-      email: userExist.email,
-    });
+    const accessToken = generateToken(
+      {
+        id: userExist._id,
+        email: userExist.email,
+        fullName: userExist.fullName,
+      },
+      TokenEnum.accessToken,
+    );
+    const refreshToken = generateToken(
+      {
+        id: userExist._id,
+        email: userExist.email,
+        fullName: userExist.fullName,
+      },
+      TokenEnum.refreshToken,
+    );
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 
   const [firstName, lastName] = payload.name.split(" ");
@@ -116,8 +161,22 @@ export const logInWithGoogle = async (idToken) => {
     isVerified: true,
     provider: ProviderEnum.Google,
   });
-  return generateToken({
-    id: createdUser._id,
-    email: createdUser.email,
-  });
+  const accessToken = generateToken(
+    {
+      id: createdUser._id,
+      email: createdUser.email,
+    },
+    TokenEnum.accessToken,
+  );
+  const refreshToken = generateToken(
+    {
+      id: createdUser._id,
+      email: createdUser.email,
+    },
+    TokenEnum.refreshToken,
+  );
+  return {
+    accessToken,
+    refreshToken,
+  };
 };

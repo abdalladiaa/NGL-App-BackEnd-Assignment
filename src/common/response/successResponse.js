@@ -7,6 +7,6 @@ export default function successResponse({
   return res.status(status).send({
     success: true,
     message,
-    data,
+    ...data,
   });
 }

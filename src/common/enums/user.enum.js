@@ -9,3 +9,4 @@ export const ProviderEnum = {
   Google: "google",
   Facebook: "facebook",
 };
+

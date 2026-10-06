@@ -1,4 +1,4 @@
-import "./common/config/config.js"
+import "./common/config/config.js";
 import express from "express";
 import cors from "cors";
 import userRouter from "./modules/user/user.routes.js";
@@ -11,7 +11,14 @@ import { PORT } from "./common/config/config.js";
 
 const app = express();
 
-app.use(cors(), express.json());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  }),
+);
+
+app.use(express.json());
 
 await dbConnection();
 

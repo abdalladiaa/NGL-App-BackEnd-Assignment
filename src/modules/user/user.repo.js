@@ -6,3 +6,7 @@ export async function updateUserByEmail(email, updatedData) {
     runValidators: true,
   });
 }
+
+export async function getUserById(id) {
+  return await User.findById(id);
+}

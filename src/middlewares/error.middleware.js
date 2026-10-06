@@ -1,16 +1,14 @@
 import { logger } from "../common/log/logger.js";
 
 export default function errorMiddleWare(err, req, res, next) {
-  console.log(err.stack);
-  
-  logger.error(err.message);
+  logger.error(err.message, { stack: err.stack });
   if (err.isOperational) {
-    return res.status(err.statusCode).send({
+    return res.status(err.statusCode).json({
       success: false,
       message: err.message,
     });
   }
-  return res.status(500).send({
+  return res.status(500).json({
     success: false,
     message: "Internal server error",
   });

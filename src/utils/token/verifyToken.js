@@ -1,9 +1,9 @@
 import jwt from "jsonwebtoken";
 import authError from "../../modules/auth/auth.error.js";
 
-export default function decodeToken(token) {
+export default function verifyToken(token, secret) {
   try {
-    return jwt.decode(token);
+    return jwt.verify(token, secret);
   } catch (err) {
     throw authError.invalidAccessToken();
   }

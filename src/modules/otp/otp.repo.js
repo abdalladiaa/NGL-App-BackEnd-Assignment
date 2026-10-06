@@ -1,7 +1,11 @@
 import OTP from "../../database/models/otp.model.js";
 
 export async function createOtp(otpData) {
-  return await OTP.create(otpData);
+  return await OTP.findOneAndUpdate(
+    { email: otpData.email },
+    { $set: otpData },
+    { upsert: true, returnDocument: "after", runValidators: true },
+  );
 }
 
 export async function getOtpByEmail(email) {

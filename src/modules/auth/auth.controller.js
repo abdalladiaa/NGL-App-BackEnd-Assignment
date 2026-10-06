@@ -6,12 +6,14 @@ import * as authService from "./auth.service.js";
 export const register = async (req, res, next) => {
   try {
     const userData = req.body;
+
     const createdUser = await authService.register(userData);
+
     successResponse({
       res,
       message: "user created successfully",
       status: 201,
-      data: createdUser,
+      data: { user: createdUser },
     });
   } catch (err) {
     next(err);
@@ -34,15 +36,22 @@ export const verifyAccount = async (req, res, next) => {
 
 export const login = async (req, res, next) => {
   try {
-    const { email, password } = req.body ;
-    const token = await authService.login(email, password);
-    const data = await decodeToken(token);
+    const { email, password } = req.body;
+    const { accessToken, refreshToken } = await authService.login(
+      email,
+      password,
+    );
 
-    saveTokenInCookie(res, token);
+    const user = decodeToken(accessToken);
+
     successResponse({
       res,
       message: "user login successfully",
-      data,
+      data: {
+        user,
+        accessToken,
+        refreshToken,
+      },
     });
   } catch (err) {
     next(err);
@@ -51,7 +60,7 @@ export const login = async (req, res, next) => {
 
 export const sendOtp = async (req, res, next) => {
   try {
-    const { email } = req.body ;
+    const { email } = req.body;
     await authService.sendOtp(email);
     successResponse({ res, status: 200, message: "OTP sent successfully" });
   } catch (err) {
@@ -76,16 +85,21 @@ export const resetPassword = async (req, res, next) => {
 export const loginWithGoogle = async (req, res, next) => {
   try {
     const { idToken } = req.body;
-    const token = await authService.logInWithGoogle(idToken);
-    const data = await decodeToken(token);
-    console.log(data);
+    const { accessToken, refreshToken } =
+      await authService.logInWithGoogle(idToken);
+    const user = decodeToken(accessToken);
 
-    saveTokenInCookie(res, token);
+    saveTokenInCookie(res, accessToken);
+
     successResponse({
-      status: 200,
       res,
+      status: 200,
       message: "user logged in successfully",
-      data,
+      data: {
+        user,
+        accessToken,
+        refreshToken,
+      },
     });
   } catch (err) {
     next(err);
