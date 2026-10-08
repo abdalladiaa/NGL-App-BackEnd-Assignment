@@ -1,7 +1,7 @@
 import { OAuth2Client } from "google-auth-library";
-import { GOOGLE_CLIENT_ID } from "../../common/config/config.js";
+import { GOOGLE_CLIENT_ID } from "../../lib/config/config.js";
 import userError from "../../modules/user/user.error.js";
-import { logger } from "../../common/log/logger.js";
+import { logger } from "../../pkg/log/logger.js";
 
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import { logger } from "../common/log/logger.js";
-import { MONGO_URI } from "../common/config/config.js";
+import { logger } from "../pkg/log/logger.js";
+import { MONGO_URI } from "../lib/config/config.js";
 
 const dbConnection = async () => {
   try {

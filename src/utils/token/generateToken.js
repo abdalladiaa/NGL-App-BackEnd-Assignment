@@ -5,9 +5,9 @@ import {
   JWT_ACCESS_SECRET,
   JWT_REFRESH_EXPIRES_IN,
   JWT_REFRESH_SECRET,
-} from "../../common/config/config.js";
+} from "../../lib/config/config.js";
 
-import { TokenEnum } from "../../common/enums/token.enum.js";
+import { TokenEnum } from "../../lib/enums/token.enum.js";
 
 export default function generateToken(
   payload = {},

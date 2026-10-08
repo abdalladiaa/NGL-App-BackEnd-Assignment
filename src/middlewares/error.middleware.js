@@ -1,4 +1,4 @@
-import { logger } from "../common/log/logger.js";
+import { logger } from "../pkg/log/logger.js";
 
 export default function errorMiddleWare(err, req, res, next) {
   logger.error(err.message, { stack: err.stack });

@@ -1,4 +1,4 @@
-import AppError from "../common/error/error.js";
+import AppError from "../pkg/error/error.js";
 
 export function validateBody(dto) {
   return (req, res, next) => {

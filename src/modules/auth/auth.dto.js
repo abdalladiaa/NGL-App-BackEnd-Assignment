@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { GenderEnum } from "../../common/enums/user.enum.js";
+import { GenderEnum } from "../../lib/enums/user.enum.js";
 
 export const registerDto = z
   .object({

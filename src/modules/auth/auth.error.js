@@ -1,4 +1,5 @@
-import AppError from "../../common/error/error.js";
+import AppError from "../../pkg/error/error.js";
+
 
 const authError = {
   invalidAccessToken: () => new AppError("Invalid access token", 401),

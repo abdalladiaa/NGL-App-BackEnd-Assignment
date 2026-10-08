@@ -1,8 +1,8 @@
 import {
   JWT_ACCESS_SECRET,
   JWT_REFRESH_SECRET,
-} from "../common/config/config.js";
-import { TokenEnum } from "../common/enums/token.enum.js";
+} from "../lib/config/config.js";
+import { TokenEnum } from "../lib/enums/token.enum.js";
 import authError from "../modules/auth/auth.error.js";
 import verifyToken from "../utils/token/verifyToken.js";
 

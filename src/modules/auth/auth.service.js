@@ -1,5 +1,5 @@
 import userError from "../user/user.error.js";
-import { sendEmail } from "../../common/mail/mail.js";
+import { sendEmail } from "../../lib/mail/mail.js";
 import { verifyEmailTemplate } from "../../templates/verifyEmail.template.js";
 import hashPassword from "../../utils/hashing/hashPassword.js";
 import generateOtp from "../../utils/otp/generateOtp.js";
@@ -11,8 +11,8 @@ import generateToken from "../../utils/token/generateToken.js";
 import encryption from "../../utils/encryption/encryption.js";
 import { decryption } from "../../utils/encryption/decryption.js";
 import { verifyGoogleToken } from "../../utils/google/verifyGoogleToken.js";
-import { ProviderEnum } from "../../common/enums/user.enum.js";
-import { TokenEnum } from "../../common/enums/token.enum.js";
+import { ProviderEnum } from "../../lib/enums/user.enum.js";
+import { TokenEnum } from "../../lib/enums/token.enum.js";
 import { toMs } from "../../utils/times/times.js";
 
 export const register = async (userData) => {

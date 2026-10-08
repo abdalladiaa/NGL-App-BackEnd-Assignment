@@ -1,5 +1,5 @@
-import { TokenEnum } from "../../common/enums/token.enum.js";
-import successResponse from "../../common/response/successResponse.js";
+import { TokenEnum } from "../../lib/enums/token.enum.js";
+import successResponse from "../../lib/response/successResponse.js";
 import decodeToken from "../../utils/token/decodeToken.js";
 import saveTokenInCookie from "../../utils/token/saveTokenInCookie.js";
 import * as authService from "./auth.service.js";
@@ -38,6 +38,7 @@ export const verifyAccount = async (req, res, next) => {
 export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
+        console.log(req.cookies);
     const { accessToken, refreshToken } = await authService.login(
       email,
       password,
@@ -89,6 +90,8 @@ export const resetPassword = async (req, res, next) => {
 export const loginWithGoogle = async (req, res, next) => {
   try {
     const { idToken } = req.body;
+
+    
     const { accessToken, refreshToken } =
       await authService.logInWithGoogle(idToken);
     const user = decodeToken(accessToken);

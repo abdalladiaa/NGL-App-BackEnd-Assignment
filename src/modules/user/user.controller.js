@@ -1,4 +1,4 @@
-import successResponse from "../../common/response/successResponse.js";
+import successResponse from "../../lib/response/successResponse.js";
 import * as userService from "./user.service.js";
 
 export const getProfile = async (req, res, next) => {
