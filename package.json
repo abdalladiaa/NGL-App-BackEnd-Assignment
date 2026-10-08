@@ -2,7 +2,7 @@
   "name": "ngl-app",
   "version": "1.0.0",
   "description": "",
-  "main": "src/index.js",
+  "main": "src/server.js",
   "scripts": {
     "dev": "cross-env NODE_ENV=dev node --watch .",
     "start:dev": "cross-env NODE_ENV=dev node .",

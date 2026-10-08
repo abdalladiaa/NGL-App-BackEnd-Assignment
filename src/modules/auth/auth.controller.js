@@ -38,7 +38,6 @@ export const verifyAccount = async (req, res, next) => {
 export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-        console.log(req.cookies);
     const { accessToken, refreshToken } = await authService.login(
       email,
       password,
