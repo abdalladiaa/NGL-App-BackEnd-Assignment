@@ -1,6 +1,6 @@
 import CryptoJS from "crypto-js";
-import { ENCRYPTION_KEY } from "../../lib/config/config.js";
+import config from "../../lib/config/config.js";
 
 export default function encryption(text) {
-  return  CryptoJS.AES.encrypt(text, ENCRYPTION_KEY).toString();
+  return CryptoJS.AES.encrypt(text, config.encription.key).toString();
 }

@@ -1,7 +1,4 @@
-import {
-  JWT_ACCESS_EXPIRES_IN,
-  JWT_REFRESH_EXPIRES_IN,
-} from "../../lib/config/config.js";
+import config from "../../lib/config/config.js";
 import { TokenEnum } from "../../lib/enums/token.enum.js";
 
 export default function saveTokenInCookie(
@@ -11,11 +8,17 @@ export default function saveTokenInCookie(
 ) {
   const isAccessToken = tokenType === TokenEnum.accessToken;
 
-  res.cookie(isAccessToken ? "access_token" : "refresh_token", token, {
-    httpOnly: true,
-    secure: false,
-    maxAge: isAccessToken ? JWT_ACCESS_EXPIRES_IN : JWT_REFRESH_EXPIRES_IN,
-  });
+  res.cookie(
+    isAccessToken ? TokenEnum.accessToken : TokenEnum.refreshToken,
+    token,
+    {
+      httpOnly: true,
+      secure: false,
+      maxAge: isAccessToken
+        ? config.jwt.accessExpiresIn
+        : config.jwt.refreshExpiresIn,
+    },
+  );
 
   return true;
 }

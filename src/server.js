@@ -2,15 +2,18 @@ import http from "node:http";
 import { createApp } from "./app.js";
 import mongoose from "mongoose";
 import { logger } from "./pkg/log/logger.js";
-import { PORT } from "./lib/config/config.js";
 
 const app = await createApp();
 
 const server = http.createServer(app);
 
-server.listen(PORT, () => {
-  logger.info(`server is running on port ${PORT}`);
+const port = process.env.PORT || 5000;
+
+server.listen(port, () => {
+  logger.info(`server is running on port ${port}`);
 });
+
+
 
 async function shutDown() {
   server.close(async () => {

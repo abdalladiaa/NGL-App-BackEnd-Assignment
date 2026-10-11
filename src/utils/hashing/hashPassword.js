@@ -1,6 +1,9 @@
 import bcrypt from "bcrypt";
-import { SALT_ROUND } from "../../lib/config/config.js";
+import config from "../../lib/config/config.js";
 
-export default async function hashPassword(password, salt = SALT_ROUND) {
+export default async function hashPassword(
+  password,
+  salt = config.encription.saltRound,
+) {
   return await bcrypt.hash(password, salt);
 }

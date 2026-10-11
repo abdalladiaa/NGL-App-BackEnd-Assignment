@@ -1,12 +1,13 @@
 import Redis from "ioredis";
+import config from "../../lib/config/config.js";
 
 export class RedisCacheProvider {
   client;
-  constructor(config) {
+  constructor(redisConfig = config.redis) {
     this.client = new Redis({
-      host: config.host,
-      port: config.port,
-      password: config.password,
+      host: redisConfig.host,
+      port: redisConfig.port,
+      password: redisConfig.password,
       lazyConnect: true,
       maxLoadingRetryTime: 3,
     });

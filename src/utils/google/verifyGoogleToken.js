@@ -1,15 +1,15 @@
 import { OAuth2Client } from "google-auth-library";
-import { GOOGLE_CLIENT_ID } from "../../lib/config/config.js";
+import config from "../../lib/config/config.js";
 import userError from "../../modules/user/user.error.js";
 import { logger } from "../../pkg/log/logger.js";
 
-const client = new OAuth2Client(GOOGLE_CLIENT_ID);
+const client = new OAuth2Client(config.google.clientId);
 
 export const verifyGoogleToken = async (idToken) => {
   try {
     const ticket = await client.verifyIdToken({
       idToken,
-      audience: GOOGLE_CLIENT_ID,
+      audience: config.google.clientId,
     });
     return ticket.getPayload();
   } catch (err) {

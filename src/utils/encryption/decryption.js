@@ -1,8 +1,8 @@
 import CryptoJS from "crypto-js";
-import { ENCRYPTION_KEY } from "../../lib/config/config.js";
+import config from "../../lib/config/config.js";
 
-export  function decryption(encryptedText) {
-  return  CryptoJS.AES.decrypt(encryptedText, ENCRYPTION_KEY).toString(
+export function decryption(encryptedText) {
+  return CryptoJS.AES.decrypt(encryptedText, config.encription.key).toString(
     CryptoJS.enc.Utf8,
   );
 }

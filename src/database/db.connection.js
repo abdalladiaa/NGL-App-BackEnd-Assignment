@@ -1,10 +1,9 @@
 import mongoose from "mongoose";
 import { logger } from "../pkg/log/logger.js";
-import { MONGO_URI } from "../lib/config/config.js";
 
 const dbConnection = async () => {
   try {
-    await mongoose.connect(MONGO_URI);
+    await mongoose.connect(process.env.MONGO_URI);
     logger.info("DB connected")
   } catch (err) {
     logger.error(err)

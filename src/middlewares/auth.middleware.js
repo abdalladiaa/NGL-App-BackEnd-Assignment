@@ -1,7 +1,4 @@
-import {
-  JWT_ACCESS_SECRET,
-  JWT_REFRESH_SECRET,
-} from "../lib/config/config.js";
+import config from "../lib/config/config.js";
 import { TokenEnum } from "../lib/enums/token.enum.js";
 import authError from "../modules/auth/auth.error.js";
 import verifyToken from "../utils/token/verifyToken.js";
@@ -9,7 +6,7 @@ import verifyToken from "../utils/token/verifyToken.js";
 export function auth(tokenType = TokenEnum.accessToken) {
   return async (req, res, next) => {
     try {
-      let accessToken = req.cookies["access_token"];
+      let accessToken = req.cookies[TokenEnum.accessToken];
 
       if (!accessToken) {
         next(authError.unauthorized());
@@ -18,8 +15,8 @@ export function auth(tokenType = TokenEnum.accessToken) {
       const payload = verifyToken(
         accessToken,
         tokenType === TokenEnum.accessToken
-          ? JWT_ACCESS_SECRET
-          : JWT_REFRESH_SECRET,
+          ? config.jwt.accessSecret
+          : config.jwt.refreshSecret,
       );
 
       if (!payload.id) {

@@ -1,4 +1,4 @@
-import mongoose, { model } from "mongoose";
+import mongoose from "mongoose";
 
 const otpModel = new mongoose.Schema(
   {
@@ -23,6 +23,6 @@ const otpModel = new mongoose.Schema(
   },
 );
 
-const OTP = model("OTP", otpModel);
+const OTP = mongoose.models.OTP || mongoose.model("OTP", otpModel);
 
 export default OTP;

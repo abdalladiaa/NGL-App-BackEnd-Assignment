@@ -41,7 +41,7 @@ const userSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
-      enum: GenderEnum,
+      enum: Object.values(GenderEnum),
       default: GenderEnum.Other,
     },
     isVerified: {
@@ -50,7 +50,7 @@ const userSchema = new mongoose.Schema(
     },
     provider: {
       type: String,
-      enum: ProviderEnum,
+      enum: Object.values(ProviderEnum),
       default: ProviderEnum.Local,
     },
   },
@@ -68,6 +68,6 @@ const userSchema = new mongoose.Schema(
   },
 );
 
-const User = mongoose.model("User", userSchema);
+const User = mongoose.models.User || mongoose.model("User", userSchema);
 
 export default User;

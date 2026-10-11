@@ -1,17 +1,17 @@
 import nodemailer from "nodemailer";
-import { EMAIL, EMAIL_PASS } from "../../lib/config/config.js";
+import config from "../../lib/config/config.js";
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
   secure: false,
   auth: {
-    user: EMAIL,
-    pass: EMAIL_PASS,
+    user: config.nodeMailer.email,
+    pass: config.nodeMailer.password,
   },
 });
 export async function sendEmail(to, subject, html) {
   await transporter.sendMail({
-    from: `"NGL-App" <${EMAIL}>`,
+    from: `"NGL-App" <${config.nodeMailer.email}>`,
     to,
     subject,
     html,

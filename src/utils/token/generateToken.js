@@ -1,11 +1,6 @@
 import jwt from "jsonwebtoken";
 
-import {
-  JWT_ACCESS_EXPIRES_IN,
-  JWT_ACCESS_SECRET,
-  JWT_REFRESH_EXPIRES_IN,
-  JWT_REFRESH_SECRET,
-} from "../../lib/config/config.js";
+import config from "../../lib/config/config.js";
 
 import { TokenEnum } from "../../lib/enums/token.enum.js";
 
@@ -19,9 +14,11 @@ export default function generateToken(
     {
       ...payload,
     },
-    isAccessToken ? JWT_ACCESS_SECRET : JWT_REFRESH_SECRET,
+    isAccessToken ? config.jwt.accessSecret : config.jwt.refreshSecret,
     {
-      expiresIn: isAccessToken ? JWT_ACCESS_EXPIRES_IN : JWT_REFRESH_EXPIRES_IN,
+      expiresIn: isAccessToken
+        ? config.jwt.accessExpiresIn
+        : config.jwt.refreshExpiresIn,
     },
   );
 }
