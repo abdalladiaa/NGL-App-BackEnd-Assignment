@@ -1,10 +1,8 @@
 import "./lib/config/config.js";
 import express from "express";
 import cors from "cors";
-import userRouter from "./modules/user/user.routes.js";
 import dbConnection from "./database/db.connection.js";
 import errorMiddleware from "./middlewares/error.middleware.js";
-import authRouter from "./modules/auth/auth.routes.js";
 import AppError from "./pkg/error/error.js";
 import cookieParser from "cookie-parser";
 import { router } from "./route.js";

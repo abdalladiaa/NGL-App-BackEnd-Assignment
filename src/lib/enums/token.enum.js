@@ -1,4 +1,4 @@
 export const TokenEnum = {
-  accessToken: "ACCESS_TOKEN",
-  refreshToken: "REFRESH_TOKEN",
+  accessToken: "access_token",
+  refreshToken: "refresh_token",
 };

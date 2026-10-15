@@ -90,7 +90,6 @@ export const loginWithGoogle = async (req, res, next) => {
   try {
     const { idToken } = req.body;
 
-    
     const { accessToken, refreshToken } =
       await authService.logInWithGoogle(idToken);
     const user = decodeToken(accessToken);
@@ -106,6 +105,25 @@ export const loginWithGoogle = async (req, res, next) => {
         user,
         accessToken,
         refreshToken,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const rotateToken = async (req, res, next) => {
+  try {
+    const payload = req.payload;
+    const tokens = await authService.rotateToken(payload);
+    saveTokenInCookie(res, tokens.accessToken, TokenEnum.accessToken);
+    saveTokenInCookie(res, tokens.refreshToken, TokenEnum.refreshToken);
+    successResponse({
+      res,
+      status: 200,
+      data: {
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
       },
     });
   } catch (err) {

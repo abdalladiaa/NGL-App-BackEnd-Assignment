@@ -1,32 +1,38 @@
 import config from "../lib/config/config.js";
 import { TokenEnum } from "../lib/enums/token.enum.js";
 import authError from "../modules/auth/auth.error.js";
+import getTokenSecret from "../utils/token/getTokenSecret.js";
 import verifyToken from "../utils/token/verifyToken.js";
 
 export function auth(tokenType = TokenEnum.accessToken) {
-  return async (req, res, next) => {
+  return (req, res, next) => {
     try {
-      let accessToken = req.cookies[TokenEnum.accessToken];
+      const token = req.cookies?.[tokenType];
 
-      if (!accessToken) {
-        next(authError.unauthorized());
+      console.log({ token });
+
+      if (!token) {
+        return next(authError.unauthorized());
       }
 
-      const payload = verifyToken(
-        accessToken,
-        tokenType === TokenEnum.accessToken
-          ? config.jwt.accessSecret
-          : config.jwt.refreshSecret,
-      );
+      const secret = getTokenSecret(tokenType);
+
+      const payload = verifyToken(token, secret);
+
+      console.log({ payload });
 
       if (!payload.id) {
-        next(authError.idNotFound());
+        return next(authError.idNotFound());
+      }
+
+      if (payload.type !== tokenType) {
+        return next(authError.unauthorized());
       }
 
       req.payload = payload;
-      next();
+      return next();
     } catch (err) {
-      next(err);
+      return next(err);
     }
   };
 }

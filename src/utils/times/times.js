@@ -16,3 +16,23 @@ export const toMs = (value, unit) => {
       throw new Error("Invalid time unit");
   }
 };
+
+
+export const toSeconde = (value, unit) => {
+  switch (unit) {
+    case "ms":
+      return value / 1000;
+
+    case "minute":
+      return value * 60;
+
+    case "hour":
+      return value * 60 * 60;
+
+    case "day":
+      return value * 24 * 60 * 60;
+
+    default:
+      throw new Error("Invalid time unit");
+  }
+};

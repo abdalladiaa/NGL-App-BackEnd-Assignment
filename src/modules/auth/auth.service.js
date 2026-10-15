@@ -14,6 +14,7 @@ import { verifyGoogleToken } from "../../utils/google/verifyGoogleToken.js";
 import { ProviderEnum } from "../../lib/enums/user.enum.js";
 import { TokenEnum } from "../../lib/enums/token.enum.js";
 import { toMs } from "../../utils/times/times.js";
+import authError from "./auth.error.js";
 
 export const register = async (userData) => {
   const userExist = await authRepo.checkUserExistByEmail(userData.email);
@@ -180,3 +181,26 @@ export const logInWithGoogle = async (idToken) => {
     refreshToken,
   };
 };
+
+export const rotateToken = async (payload) => {
+  const { iat, exp, ...user } = payload;
+
+  const now = Math.floor(Date.now() / 1000);
+  const refreshExpiresIn = exp - now;
+
+  if (refreshExpiresIn <= 0) {
+    throw new authError.expiredRefreshToken();
+  }
+
+  const accessToken = generateToken(user, TokenEnum.accessToken);
+
+  const refreshToken = generateToken(
+    user,
+    TokenEnum.refreshToken,
+    refreshExpiresIn,
+  );
+
+  return { accessToken, refreshToken };
+};
+
+export const logout = (token) => {};

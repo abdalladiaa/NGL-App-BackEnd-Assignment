@@ -1,9 +1,8 @@
 import Redis from "ioredis";
-import config from "../../lib/config/config.js";
 
 export class RedisCacheProvider {
   client;
-  constructor(redisConfig = config.redis) {
+  constructor(redisConfig) {
     this.client = new Redis({
       host: redisConfig.host,
       port: redisConfig.port,
@@ -17,9 +16,13 @@ export class RedisCacheProvider {
     this.client.connect().catch((err) => console.log(err.message));
   }
 
-  async set(key, value, ttl) {
-    return this.client.set(key, value, "EX", ttl);
+async set(key, value, ttl) {
+  if (!ttl) {
+    return this.client.set(key, JSON.stringify(value));
   }
+
+  return this.client.set(key, JSON.stringify(value), "EX", ttl);
+}
 
   async get(key) {
     return this.client.get(key);
@@ -27,5 +30,9 @@ export class RedisCacheProvider {
 
   async del(key) {
     return this.client.del(key);
+  }
+
+  async ttl(key){
+    return this.client.ttl(key)
   }
 }
