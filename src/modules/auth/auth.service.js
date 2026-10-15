@@ -15,6 +15,10 @@ import { ProviderEnum } from "../../lib/enums/user.enum.js";
 import { TokenEnum } from "../../lib/enums/token.enum.js";
 import { toMs } from "../../utils/times/times.js";
 import authError from "./auth.error.js";
+import { generateRandomUUID } from "../../utils/random/random.js";
+import cacheClient from "../../lib/cache/init.js";
+import getTokenTTL from "../../utils/token/getTokenTTL.js";
+import { getUserRevokeTokenKey } from "../../utils/cache/getUserRevokeTokenKey.js";
 
 export const register = async (userData) => {
   const userExist = await authRepo.checkUserExistByEmail(userData.email);
@@ -75,11 +79,13 @@ export const login = async (email, password) => {
 
   userExist.phone = decryption(userExist.phone);
 
+  const jti = generateRandomUUID();
   const accessToken = generateToken(
     {
       id: userExist._id,
       email: userExist.email,
       fullName: userExist.fullName,
+      jti,
     },
     TokenEnum.accessToken,
   );
@@ -89,6 +95,7 @@ export const login = async (email, password) => {
       id: userExist._id,
       email: userExist.email,
       fullName: userExist.fullName,
+      jti,
     },
     TokenEnum.refreshToken,
   );
@@ -131,12 +138,14 @@ export const logInWithGoogle = async (idToken) => {
   const payload = await verifyGoogleToken(idToken);
 
   const userExist = await authRepo.checkUserExistByEmail(payload.email);
+  const jti = generateRandomUUID();
   if (userExist) {
     const accessToken = generateToken(
       {
         id: userExist._id,
         email: userExist.email,
         fullName: userExist.fullName,
+        jti,
       },
       TokenEnum.accessToken,
     );
@@ -145,6 +154,7 @@ export const logInWithGoogle = async (idToken) => {
         id: userExist._id,
         email: userExist.email,
         fullName: userExist.fullName,
+        jti,
       },
       TokenEnum.refreshToken,
     );
@@ -162,10 +172,13 @@ export const logInWithGoogle = async (idToken) => {
     isVerified: true,
     provider: ProviderEnum.Google,
   });
+  const fullName = `${firstName} ${lastName}`;
   const accessToken = generateToken(
     {
       id: createdUser._id,
       email: createdUser.email,
+      fullName,
+      jti,
     },
     TokenEnum.accessToken,
   );
@@ -173,6 +186,8 @@ export const logInWithGoogle = async (idToken) => {
     {
       id: createdUser._id,
       email: createdUser.email,
+      fullName,
+      jti,
     },
     TokenEnum.refreshToken,
   );
@@ -185,8 +200,7 @@ export const logInWithGoogle = async (idToken) => {
 export const rotateToken = async (payload) => {
   const { iat, exp, ...user } = payload;
 
-  const now = Math.floor(Date.now() / 1000);
-  const refreshExpiresIn = exp - now;
+  const refreshExpiresIn = getTokenTTL(exp);
 
   if (refreshExpiresIn <= 0) {
     throw new authError.expiredRefreshToken();
@@ -203,4 +217,8 @@ export const rotateToken = async (payload) => {
   return { accessToken, refreshToken };
 };
 
-export const logout = (token) => {};
+export const logout = async (payload) => {
+  const { id, jti, exp } = payload;
+  const ttl = getTokenTTL(exp);
+  return await cacheClient.set(getUserRevokeTokenKey(id, jti), jti, ttl);
+};

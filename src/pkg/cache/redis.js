@@ -35,4 +35,8 @@ async set(key, value, ttl) {
   async ttl(key){
     return this.client.ttl(key)
   }
+
+  async exists(key){
+    return this.client.exists(key)
+  }
 }

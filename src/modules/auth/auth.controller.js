@@ -130,3 +130,14 @@ export const rotateToken = async (req, res, next) => {
     next(err);
   }
 };
+
+export const logout = async (req, res, next) => {
+  try {
+    const payload = req.payload;
+    
+    const result = await authService.logout(payload);
+    successResponse({ res, status: 200, data: { result } });
+  } catch (err) {
+    next(err);
+  }
+};

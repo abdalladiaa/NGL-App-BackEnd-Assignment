@@ -14,5 +14,6 @@ authRouter.post("/send-otp", validateBody(sendOtpDto),authController.sendOtp);
 authRouter.patch("/reset-password", validateBody(resetPasswordDto), authController.resetPassword);
 authRouter.post("/login-with-google",validateBody(logInWithGoogleDto), authController.loginWithGoogle);
 authRouter.post("/rotate-token" , auth(TokenEnum.refreshToken) , authController.rotateToken)
+authRouter.post('/logout' , auth(TokenEnum.refreshToken) , authController.logout)
 
 export default authRouter;

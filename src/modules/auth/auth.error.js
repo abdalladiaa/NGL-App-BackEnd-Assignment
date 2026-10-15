@@ -1,6 +1,5 @@
 import AppError from "../../pkg/error/error.js";
 
-
 const authError = {
   invalidAccessToken: () => new AppError("Invalid access token", 401),
 
@@ -12,7 +11,9 @@ const authError = {
 
   unauthorized: () => new AppError("Unauthorized", 401),
 
-  idNotFound: ()=> new AppError("Id not found" , 401)
+  idNotFound: () => new AppError("Id not found", 401),
+
+  tokenRevoked: () => new AppError("Token has been revoked, please login again", 401),
 };
 
 export default authError;
