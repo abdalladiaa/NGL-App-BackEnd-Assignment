@@ -1,12 +1,12 @@
 export const GenderEnum = {
-  Male: "male",
-  Female: "female",
-  Other: "other",
+  MALE: "male",
+  FEMALE: "female",
+  OTHER: "other",
 };
 
 export const ProviderEnum = {
-  Local: "local",
-  Google: "google",
-  Facebook: "facebook",
+  LOCAL: "local",
+  GOOGLE: "google",
+  FACEBOOK: "facebook",
 };
 

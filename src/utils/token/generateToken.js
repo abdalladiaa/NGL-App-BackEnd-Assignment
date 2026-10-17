@@ -7,10 +7,10 @@ import getTokenExpiresIn from "./getExpiresIn.js";
 
 export default function generateToken(
   payload = {},
-  tokenType = TokenEnum.accessToken,
+  tokenType = TokenEnum.ACCESS_TOKEN,
   expiresIn = getTokenExpiresIn(tokenType),
 ) {
-  const isAccessToken = tokenType === TokenEnum.accessToken;
+  const isAccessToken = tokenType === TokenEnum.ACCESS_TOKEN;
   return jwt.sign(
     {
       ...payload,

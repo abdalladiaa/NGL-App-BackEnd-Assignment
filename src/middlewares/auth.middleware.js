@@ -6,7 +6,7 @@ import { getUserRevokeTokenKey } from "../utils/cache/getUserRevokeTokenKey.js";
 import getTokenSecret from "../utils/token/getTokenSecret.js";
 import verifyToken from "../utils/token/verifyToken.js";
 
-export function auth(tokenType = TokenEnum.accessToken) {
+export function auth(tokenType = TokenEnum.ACCESS_TOKEN) {
   return async (req, res, next) => {
     try {
       const token = req.cookies?.[tokenType];
@@ -35,7 +35,7 @@ export function auth(tokenType = TokenEnum.accessToken) {
         return next(authError.tokenRevoked());
       }
 
-      req.payload = payload;
+      req.user = payload;
       return next();
     } catch (err) {
       return next(err);

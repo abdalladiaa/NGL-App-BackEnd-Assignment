@@ -8,7 +8,7 @@ export const registerDto = z
     lastName: z.string().min(3).max(20).trim(),
     password: z.string().min(4).max(20).trim(),
     confirmPassword: z.string(),
-    gender: z.enum(GenderEnum).default(GenderEnum.Other),
+    gender: z.enum(GenderEnum).default(GenderEnum.OTHER),
   })
   .refine(
     (data) => {

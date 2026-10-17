@@ -28,7 +28,7 @@ export const verifyAccount = async (req, res, next) => {
     successResponse({
       res,
       message: "user verified successfully",
-      data: user,
+      data: {user},
     });
   } catch (err) {
     next(err);
@@ -45,8 +45,8 @@ export const login = async (req, res, next) => {
 
     const user = decodeToken(accessToken);
 
-    saveTokenInCookie(res, accessToken, TokenEnum.accessToken);
-    saveTokenInCookie(res, refreshToken, TokenEnum.refreshToken);
+    saveTokenInCookie(res, accessToken, TokenEnum.ACCESS_TOKEN);
+    saveTokenInCookie(res, refreshToken, TokenEnum.REFRESH_TOKEN);
 
     successResponse({
       res,
@@ -95,7 +95,7 @@ export const loginWithGoogle = async (req, res, next) => {
     const user = decodeToken(accessToken);
 
     saveTokenInCookie(res, accessToken);
-    saveTokenInCookie(res, refreshToken, TokenEnum.refreshToken);
+    saveTokenInCookie(res, refreshToken, TokenEnum.REFRESH_TOKEN);
 
     successResponse({
       res,
@@ -114,10 +114,10 @@ export const loginWithGoogle = async (req, res, next) => {
 
 export const rotateToken = async (req, res, next) => {
   try {
-    const payload = req.payload;
-    const tokens = await authService.rotateToken(payload);
-    saveTokenInCookie(res, tokens.accessToken, TokenEnum.accessToken);
-    saveTokenInCookie(res, tokens.refreshToken, TokenEnum.refreshToken);
+    const user = req.user;
+    const tokens = await authService.rotateToken(user);
+    saveTokenInCookie(res, tokens.accessToken, TokenEnum.ACCESS_TOKEN);
+    saveTokenInCookie(res, tokens.refreshToken, TokenEnum.REFRESH_TOKEN);
     successResponse({
       res,
       status: 200,
@@ -133,9 +133,9 @@ export const rotateToken = async (req, res, next) => {
 
 export const logout = async (req, res, next) => {
   try {
-    const payload = req.payload;
+    const user = req.user;
     
-    const result = await authService.logout(payload);
+    const result = await authService.logout(user);
     successResponse({ res, status: 200, data: { result } });
   } catch (err) {
     next(err);

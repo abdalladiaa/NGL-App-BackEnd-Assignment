@@ -4,12 +4,12 @@ import { TokenEnum } from "../../lib/enums/token.enum.js";
 export default function saveTokenInCookie(
   res,
   token,
-  tokenType = TokenEnum.accessToken,
+  tokenType = TokenEnum.ACCESS_TOKEN,
 ) {
-  const isAccessToken = tokenType === TokenEnum.accessToken;
+  const isAccessToken = tokenType === TokenEnum.ACCESS_TOKEN;
 
   res.cookie(
-    isAccessToken ? TokenEnum.accessToken : TokenEnum.refreshToken,
+    isAccessToken ? TokenEnum.ACCESS_TOKEN : TokenEnum.REFRESH_TOKEN,
     token,
     {
       httpOnly: true,

@@ -36,13 +36,16 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: function () {
-        return this.provider === ProviderEnum.Local;
+        return this.provider === ProviderEnum.LOCAL;
       },
+    },
+    profilePicture: {
+      type: String,
     },
     gender: {
       type: String,
       enum: Object.values(GenderEnum),
-      default: GenderEnum.Other,
+      default: GenderEnum.OTHER,
     },
     isVerified: {
       type: Boolean,
@@ -51,7 +54,7 @@ const userSchema = new mongoose.Schema(
     provider: {
       type: String,
       enum: Object.values(ProviderEnum),
-      default: ProviderEnum.Local,
+      default: ProviderEnum.LOCAL,
     },
   },
   {

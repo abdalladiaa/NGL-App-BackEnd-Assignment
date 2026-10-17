@@ -70,7 +70,7 @@ export const login = async (email, password) => {
 
   if (!password) throw userError.passwordRequired();
 
-  if (userExist.provider === ProviderEnum.Google) {
+  if (userExist.provider === ProviderEnum.GOOGLE) {
     throw userError.googleAccount();
   }
 
@@ -87,7 +87,7 @@ export const login = async (email, password) => {
       fullName: userExist.fullName,
       jti,
     },
-    TokenEnum.accessToken,
+    TokenEnum.ACCESS_TOKEN,
   );
 
   const refreshToken = generateToken(
@@ -97,7 +97,7 @@ export const login = async (email, password) => {
       fullName: userExist.fullName,
       jti,
     },
-    TokenEnum.refreshToken,
+    TokenEnum.REFRESH_TOKEN,
   );
 
   return { accessToken, refreshToken };
@@ -147,7 +147,7 @@ export const logInWithGoogle = async (idToken) => {
         fullName: userExist.fullName,
         jti,
       },
-      TokenEnum.accessToken,
+      TokenEnum.ACCESS_TOKEN,
     );
     const refreshToken = generateToken(
       {
@@ -156,7 +156,7 @@ export const logInWithGoogle = async (idToken) => {
         fullName: userExist.fullName,
         jti,
       },
-      TokenEnum.refreshToken,
+      TokenEnum.REFRESH_TOKEN,
     );
     return {
       accessToken,
@@ -170,7 +170,7 @@ export const logInWithGoogle = async (idToken) => {
     lastName,
     email: payload.email,
     isVerified: true,
-    provider: ProviderEnum.Google,
+    provider: ProviderEnum.GOOGLE,
   });
   const fullName = `${firstName} ${lastName}`;
   const accessToken = generateToken(
@@ -180,7 +180,7 @@ export const logInWithGoogle = async (idToken) => {
       fullName,
       jti,
     },
-    TokenEnum.accessToken,
+    TokenEnum.ACCESS_TOKEN,
   );
   const refreshToken = generateToken(
     {
@@ -189,7 +189,7 @@ export const logInWithGoogle = async (idToken) => {
       fullName,
       jti,
     },
-    TokenEnum.refreshToken,
+    TokenEnum.REFRESH_TOKEN,
   );
   return {
     accessToken,
@@ -206,11 +206,11 @@ export const rotateToken = async (payload) => {
     throw new authError.expiredRefreshToken();
   }
 
-  const accessToken = generateToken(user, TokenEnum.accessToken);
+  const accessToken = generateToken(user, TokenEnum.ACCESS_TOKEN);
 
   const refreshToken = generateToken(
     user,
-    TokenEnum.refreshToken,
+    TokenEnum.REFRESH_TOKEN,
     refreshExpiresIn,
   );
 

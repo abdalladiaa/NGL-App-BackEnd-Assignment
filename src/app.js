@@ -23,6 +23,8 @@ export async function createApp() {
 
   await dbConnection();
 
+  app.use('/uploads' , express.static('uploads'))
+
 app.use('/api' , router)
 
   app.use((req, res, next) => {
