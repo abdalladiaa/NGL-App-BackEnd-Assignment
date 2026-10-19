@@ -1,15 +1,9 @@
 import nodemailer from "nodemailer";
 import config from "../../lib/config/config.js";
+import transporter from "../config/mail.config.js";
+import { EventEmitter } from "node:events";
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  secure: false,
-  auth: {
-    user: config.nodeMailer.email,
-    pass: config.nodeMailer.password,
-  },
-});
-export async function sendEmail(to, subject, html) {
+export async function sendEmail({ to, subject, html } = {}) {
   await transporter.sendMail({
     from: `"NGL-App" <${config.nodeMailer.email}>`,
     to,
@@ -17,3 +11,10 @@ export async function sendEmail(to, subject, html) {
     html,
   });
 }
+
+
+export const sendEmailEvent = new EventEmitter();
+
+sendEmailEvent.on("send-email", async ({ to, subject, html }) => {
+  await sendEmail({ to, subject, html });
+});

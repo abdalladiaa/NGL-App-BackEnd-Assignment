@@ -1,5 +1,5 @@
 import userError from "../user/user.error.js";
-import { sendEmail } from "../../lib/mail/mail.js";
+import {  sendEmailEvent } from "../../lib/mail/mail.js";
 import { verifyEmailTemplate } from "../../templates/verifyEmail.template.js";
 import hashPassword from "../../utils/hashing/hashPassword.js";
 import generateOtp from "../../utils/otp/generateOtp.js";
@@ -35,11 +35,12 @@ export const register = async (userData) => {
     expiresAt: Date.now() + toMs(5, "minute"),
   });
 
-  await sendEmail(
-    userData.email,
-    "Verification OTP",
-    verifyEmailTemplate(code),
-  );
+  sendEmailEvent.emit("send-email", {
+    to: userData.email,
+    subject: "Verification OTP",
+    html: verifyEmailTemplate(code),
+  });
+
   return createdUser;
 };
 
@@ -116,7 +117,11 @@ export const sendOtp = async (email) => {
     expiresAt: Date.now() + toMs(5, "minute"),
   });
 
-  await sendEmail(userExist.email, "New OTP", verifyEmailTemplate(code));
+  sendEmailEvent.emit("send-email", {
+    to: userExist.email,
+    subject: "New OTP",
+    html: verifyEmailTemplate(code),
+  });
 };
 
 export const resetPassword = async (email, code, newPassword) => {
