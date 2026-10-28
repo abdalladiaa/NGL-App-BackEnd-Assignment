@@ -13,3 +13,12 @@ export const sendMessage = async (messageData) => {
   }
   return await messageRepo.sendMessage(messageData);
 };
+
+
+export const getAllMessages = async (userId)=>{
+  const userExist = await userRepo.getUserById(userId)
+  if(!userExist){
+    throw userError.userNotFound()
+  }
+  return await messageRepo.getAllMessages(userId)
+}

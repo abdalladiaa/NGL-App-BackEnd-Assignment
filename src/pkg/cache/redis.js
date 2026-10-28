@@ -3,10 +3,7 @@ import Redis from "ioredis";
 export class RedisCacheProvider {
   client;
   constructor(redisConfig) {
-    this.client = new Redis({
-      host: redisConfig.host,
-      port: redisConfig.port,
-      password: redisConfig.password,
+    this.client = new Redis( redisConfig.url,{
       lazyConnect: true,
       maxLoadingRetryTime: 3,
     });

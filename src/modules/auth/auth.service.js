@@ -18,7 +18,7 @@ import authError from "./auth.error.js";
 import { generateRandomUUID } from "../../utils/random/random.js";
 import cacheClient from "../../lib/cache/init.js";
 import getTokenTTL from "../../utils/token/getTokenTTL.js";
-import { getUserRevokeTokenKey } from "../../utils/cache/getUserRevokeTokenKey.js";
+import {  userRevokeTokenKey } from "../../utils/cache/userRevokeTokenKey.js";
 
 export const register = async (userData) => {
   const userExist = await authRepo.checkUserExistByEmail(userData.email);
@@ -225,5 +225,5 @@ export const rotateToken = async (payload) => {
 export const logout = async (payload) => {
   const { id, jti, exp } = payload;
   const ttl = getTokenTTL(exp);
-  return await cacheClient.set(getUserRevokeTokenKey(id, jti), jti, ttl);
+  return await cacheClient.set(userRevokeTokenKey(id, jti), jti, ttl);
 };

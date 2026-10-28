@@ -8,5 +8,6 @@ const messageRouter = Router();
 
 messageRouter.post("/", validateBody(sendMessageDto), messageController.sendMessage);
 messageRouter.post("/public",validateBody(sendMessageDto),auth(),messageController.sendMessage);
+messageRouter.get("/get-all-messages" , auth() , messageController.getAllMessages)
 
 export default messageRouter;

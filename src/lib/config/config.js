@@ -13,7 +13,7 @@ const config = {
     refreshSecret: process.env.JWT_REFRESH_SECRET || "",
     refreshExpiresIn: Number(process.env.JWT_REFRESH_EXPIRES_IN),
   },
-  encription: {
+  encryption: {
     key: process.env.ENCRYPTION_KEY || "",
     saltRound: Number(process.env.SALT_ROUND) || 10,
   },
@@ -21,9 +21,7 @@ const config = {
     clientId: process.env.GOOGLE_CLIENT_ID || "",
   },
   redis: {
-    host: process.env.REDIS_HOST || "",
-    port: Number(process.env.REDIS_PORT),
-    password: process.env.REDIS_PASS || "",
+    url: process.env.REDIS_URL || "",
   },
 };
 

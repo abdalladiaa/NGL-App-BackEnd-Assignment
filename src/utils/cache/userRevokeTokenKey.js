@@ -1,4 +1,4 @@
 
-export function getUserRevokeTokenKey(id , jti){
+export function userRevokeTokenKey(id , jti){
     return `User::${id}::RevokeToken::${jti}`
 }
