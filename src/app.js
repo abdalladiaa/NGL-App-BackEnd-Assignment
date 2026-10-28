@@ -6,6 +6,8 @@ import errorMiddleware from "./middlewares/error.middleware.js";
 import AppError from "./pkg/error/error.js";
 import cookieParser from "cookie-parser";
 import { router } from "./route.js";
+import helmet from "helmet";
+import limiterMiddleWare from "./middlewares/limiter.middleware.js";
 
 export async function createApp() {
   const app = express();
@@ -16,6 +18,9 @@ export async function createApp() {
       credentials: true,
     }),
   );
+
+
+  app.use(helmet())
 
   app.use(express.json());
 
