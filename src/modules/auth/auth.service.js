@@ -1,10 +1,9 @@
 import userError from "../user/user.error.js";
-import {  sendEmailEvent } from "../../lib/mail/mail.js";
+import { sendEmailEvent } from "../../lib/mail/mail.js";
 import { verifyEmailTemplate } from "../../templates/verifyEmail.template.js";
 import hashPassword from "../../utils/hashing/hashPassword.js";
 import generateOtp from "../../utils/otp/generateOtp.js";
 import * as authRepo from "./auth.repo.js";
-import * as otpRepo from "../otp/otp.repo.js";
 import * as userRepo from "../user/user.repo.js";
 import comparePassword from "../../utils/hashing/comparePassword.js";
 import generateToken from "../../utils/token/generateToken.js";
@@ -13,12 +12,14 @@ import { decryption } from "../../utils/encryption/decryption.js";
 import { verifyGoogleToken } from "../../utils/google/verifyGoogleToken.js";
 import { ProviderEnum } from "../../lib/enums/user.enum.js";
 import { TokenEnum } from "../../lib/enums/token.enum.js";
-import { toMs } from "../../utils/times/times.js";
 import authError from "./auth.error.js";
 import { generateRandomUUID } from "../../utils/random/random.js";
 import cacheClient from "../../lib/cache/init.js";
 import getTokenTTL from "../../utils/token/getTokenTTL.js";
-import {  userRevokeTokenKey } from "../../utils/cache/userRevokeTokenKey.js";
+import { userRevokeTokenKey } from "../../utils/cache/userRevokeTokenKey.js";
+import createOTP from "../../utils/otp/createOtp.js";
+import getOtpByEmail from "../../utils/otp/getOtp.js";
+import deleteOtpByEmail from "../../utils/otp/deleteOtp.js";
 
 export const register = async (userData) => {
   const userExist = await authRepo.checkUserExistByEmail(userData.email);
@@ -29,11 +30,8 @@ export const register = async (userData) => {
 
   const createdUser = await authRepo.createUser(userData);
   const code = await generateOtp();
-  await otpRepo.createOtp({
-    email: userData.email,
-    code,
-    expiresAt: Date.now() + toMs(5, "minute"),
-  });
+
+  await createOTP(userData.email, code);
 
   sendEmailEvent.emit("send-email", {
     to: userData.email,
@@ -50,15 +48,19 @@ export const verifyAccount = async (email, code) => {
 
   if (userExist.isVerified) throw userError.emailAlreadyVerified();
 
-  const otpExist = await otpRepo.getOtpByEmail(email);
+  const otpExist = await getOtpByEmail(email);
+  
+
+  
 
   if (!otpExist) throw userError.otpExpired();
+  
 
-  if (otpExist.code !== code) throw userError.invalidOtp();
+  if (otpExist !== code) throw userError.invalidOtp();
 
   const user = await userRepo.updateUserByEmail(email, { isVerified: true });
 
-  if (user) await otpRepo.deleteOTPsByEmail(user.email);
+  if (user) await deleteOtpByEmail(user.email);
 
   return user;
 };
@@ -110,12 +112,13 @@ export const sendOtp = async (email) => {
   const userExist = await authRepo.checkUserExistByEmail(email);
   if (!userExist) throw userError.userNotFound();
 
+  if (userExist.provider === ProviderEnum.GOOGLE) {
+    throw userError.googleAccount();
+  }
+
   const code = await generateOtp();
-  await otpRepo.createOtp({
-    email: userExist.email,
-    code,
-    expiresAt: Date.now() + toMs(5, "minute"),
-  });
+
+  await createOTP(userExist.email, code);
 
   sendEmailEvent.emit("send-email", {
     to: userExist.email,
@@ -125,18 +128,18 @@ export const sendOtp = async (email) => {
 };
 
 export const resetPassword = async (email, code, newPassword) => {
-  const otp = await otpRepo.getOtpByEmail(email);
+  const otp = await getOtpByEmail(email);
   if (!otp) {
     throw userError.otpExpired();
   }
-  if (otp.code !== code) {
+  if (otp !== code) {
     throw userError.invalidOtp();
   }
   newPassword = await hashPassword(newPassword);
   await userRepo.updateUserByEmail(email, {
     password: newPassword,
   });
-  await otpRepo.deleteOTPsByEmail(email);
+  await deleteOtpByEmail(email);
 };
 
 export const logInWithGoogle = async (idToken) => {
