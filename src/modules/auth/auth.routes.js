@@ -19,5 +19,7 @@ authRouter.patch("/reset-password", validateBody(resetPasswordDto), authControll
 authRouter.post("/login-with-google",validateBody(logInWithGoogleDto), authController.loginWithGoogle);
 authRouter.post("/rotate-token" , auth(TokenEnum.REFRESH_TOKEN) , authController.rotateToken)
 authRouter.post('/logout' , auth(TokenEnum.REFRESH_TOKEN) , authController.logout)
+authRouter.patch('/active-two-step-verification' , authController.enable2StepVerification)
+authRouter.post('/verify-code-two-step-verification' , authController.verifyCodeToLogin)
 
 export default authRouter;

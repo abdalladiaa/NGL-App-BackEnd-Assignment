@@ -51,6 +51,10 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    twoStepVerificationEnabled: {
+      type: Boolean,
+      default: false,
+    },
     provider: {
       type: String,
       enum: Object.values(ProviderEnum),

@@ -1,6 +1,4 @@
 import userError from "../user/user.error.js";
-import { sendEmailEvent } from "../../lib/mail/mail.js";
-import { verifyEmailTemplate } from "../../templates/verifyEmail.template.js";
 import hashPassword from "../../utils/hashing/hashPassword.js";
 import generateOtp from "../../utils/otp/generateOtp.js";
 import * as authRepo from "./auth.repo.js";
@@ -20,6 +18,7 @@ import { userRevokeTokenKey } from "../../utils/cache/userRevokeTokenKey.js";
 import createOTP from "../../utils/otp/createOtp.js";
 import getOtpByEmail from "../../utils/otp/getOtp.js";
 import deleteOtpByEmail from "../../utils/otp/deleteOtp.js";
+import { SendEmailEnum } from "../../lib/enums/send-email.enum.js";
 
 export const register = async (userData) => {
   const userExist = await authRepo.checkUserExistByEmail(userData.email);
@@ -31,13 +30,10 @@ export const register = async (userData) => {
   const createdUser = await authRepo.createUser(userData);
   const code = await generateOtp();
 
-  await createOTP(userData.email, code);
-
-  sendEmailEvent.emit("send-email", {
-    to: userData.email,
-    subject: "Verification OTP",
-    html: verifyEmailTemplate(code),
-  });
+  await createOTP(
+    { email: userData.email, code },
+    { emailType: SendEmailEnum.OTP.VERIFY_EMAIL },
+  );
 
   return createdUser;
 };
@@ -49,12 +45,8 @@ export const verifyAccount = async (email, code) => {
   if (userExist.isVerified) throw userError.emailAlreadyVerified();
 
   const otpExist = await getOtpByEmail(email);
-  
-
-  
 
   if (!otpExist) throw userError.otpExpired();
-  
 
   if (otpExist !== code) throw userError.invalidOtp();
 
@@ -63,6 +55,61 @@ export const verifyAccount = async (email, code) => {
   if (user) await deleteOtpByEmail(user.email);
 
   return user;
+};
+
+export const enable2StepVerification = async (email, code) => {
+  const userExist = await authRepo.checkUserExistByEmail(email);
+  if (!userExist) throw userError.userNotFound();
+
+  const otpExist = await getOtpByEmail(email);
+
+  if (!otpExist) throw userError.otpExpired();
+
+  if (otpExist !== code) throw userError.invalidOtp();
+
+  const user = await userRepo.updateUserByEmail(email, {
+    twoStepVerificationEnabled: true,
+  });
+
+  if (user) await deleteOtpByEmail(user.email);
+
+  return user;
+};
+
+export const verifyCodeToLogin = async (email, code) => {
+  const userExist = await authRepo.checkUserExistByEmail(email);
+  if (!userExist) throw userError.userNotFound();
+
+  const otpExist = await getOtpByEmail(email);
+
+  if (!otpExist) throw userError.otpExpired();
+
+  if (otpExist !== code) throw userError.invalidOtp();
+
+  await deleteOtpByEmail(userExist.email);
+
+  const jti = generateRandomUUID();
+  const accessToken = generateToken(
+    {
+      id: userExist._id,
+      email: userExist.email,
+      fullName: userExist.fullName,
+      jti,
+    },
+    TokenEnum.ACCESS_TOKEN,
+  );
+
+  const refreshToken = generateToken(
+    {
+      id: userExist._id,
+      email: userExist.email,
+      fullName: userExist.fullName,
+      jti,
+    },
+    TokenEnum.REFRESH_TOKEN,
+  );
+
+  return { accessToken, refreshToken };
 };
 
 export const login = async (email, password) => {
@@ -81,6 +128,15 @@ export const login = async (email, password) => {
   if (!matchPassword) throw userError.passwordIncorrect();
 
   userExist.phone = decryption(userExist.phone);
+
+  if (userExist.twoStepVerificationEnabled) {
+    const code = await generateOtp();
+    await createOTP(
+      { email, code },
+      { emailType: SendEmailEnum.OTP.TWO_STEP_VERIFICATION },
+    );
+    return;
+  }
 
   const jti = generateRandomUUID();
   const accessToken = generateToken(
@@ -118,13 +174,10 @@ export const sendOtp = async (email) => {
 
   const code = await generateOtp();
 
-  await createOTP(userExist.email, code);
-
-  sendEmailEvent.emit("send-email", {
-    to: userExist.email,
-    subject: "New OTP",
-    html: verifyEmailTemplate(code),
-  });
+  await createOTP(
+    { email: userExist.email, code },
+    { emailType: SendEmailEnum.OTP.NEW_OTP },
+  );
 };
 
 export const resetPassword = async (email, code, newPassword) => {

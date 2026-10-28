@@ -1,0 +1,8 @@
+export const SendEmailEnum = {
+  OTP: {
+    RESET_PASSWORD: "RESET_PASSWORD",
+    TWO_STEP_VERIFICATION: "TWO_STEP_VERIFICATION",
+    VERIFY_EMAIL: "VERIFY_EMAIL",
+    NEW_OTP:"NEW_OTP"
+  },
+};

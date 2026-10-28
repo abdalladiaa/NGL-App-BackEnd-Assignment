@@ -28,7 +28,43 @@ export const verifyAccount = async (req, res, next) => {
     successResponse({
       res,
       message: "user verified successfully",
-      data: {user},
+      data: { user },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const enable2StepVerification = async (req, res, next) => {
+  try {
+    const { email, code } = req.body;
+    const user = await authService.enable2StepVerification(email, code);
+    successResponse({
+      res,
+      message: "2 step verification enabled successfully",
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const verifyCodeToLogin = async (req, res, next) => {
+  try {
+    const { email, code } = req.body;
+    const tokens = await authService.verifyCodeToLogin(email, code);
+    const user = decodeToken(tokens.accessToken);
+
+    saveTokenInCookie(res, tokens.accessToken, TokenEnum.ACCESS_TOKEN);
+    saveTokenInCookie(res, tokens.refreshToken, TokenEnum.REFRESH_TOKEN);
+
+    successResponse({
+      res,
+      message: "user login successfully",
+      data: {
+        user,
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+      },
     });
   } catch (err) {
     next(err);
@@ -38,23 +74,27 @@ export const verifyAccount = async (req, res, next) => {
 export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    const { accessToken, refreshToken } = await authService.login(
-      email,
-      password,
-    );
+    const tokens = await authService.login(email, password);
 
-    const user = decodeToken(accessToken);
+    if (!tokens) {
+      return successResponse({
+        res,
+        message: "OTP sent successfully",
+      });
+    }
 
-    saveTokenInCookie(res, accessToken, TokenEnum.ACCESS_TOKEN);
-    saveTokenInCookie(res, refreshToken, TokenEnum.REFRESH_TOKEN);
+    const user = decodeToken(tokens.accessToken);
+
+    saveTokenInCookie(res, tokens.accessToken, TokenEnum.ACCESS_TOKEN);
+    saveTokenInCookie(res, tokens.refreshToken, TokenEnum.REFRESH_TOKEN);
 
     successResponse({
       res,
       message: "user login successfully",
       data: {
         user,
-        accessToken,
-        refreshToken,
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
       },
     });
   } catch (err) {
@@ -134,7 +174,7 @@ export const rotateToken = async (req, res, next) => {
 export const logout = async (req, res, next) => {
   try {
     const user = req.user;
-    
+
     const result = await authService.logout(user);
     successResponse({ res, status: 200, data: { result } });
   } catch (err) {
