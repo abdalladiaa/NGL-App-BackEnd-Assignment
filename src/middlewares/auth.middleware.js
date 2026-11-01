@@ -1,5 +1,4 @@
 import cacheClient from "../lib/cache/init.js";
-import config from "../lib/config/config.js";
 import { TokenEnum } from "../lib/enums/token.enum.js";
 import authError from "../modules/auth/auth.error.js";
 import { userRevokeTokenKey } from "../utils/cache/userRevokeTokenKey.js";
@@ -10,7 +9,7 @@ export function auth(tokenType = TokenEnum.ACCESS_TOKEN) {
   return async (req, res, next) => {
     try {
       const token = req.cookies?.[tokenType];
-
+      
       if (!token) {
         return next(authError.unauthorized());
       }

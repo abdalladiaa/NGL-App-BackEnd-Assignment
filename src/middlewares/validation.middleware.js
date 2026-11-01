@@ -13,3 +13,18 @@ export function validateBody(dto) {
     next();
   };
 }
+
+
+export function validateParams(dto){
+  return (req, res, next) => {
+    const result = dto.safeParse(req.params);
+    if (result.success === false) {
+      const errMsgs = result.error.issues
+        .map((issue) => `${issue.path[0]} : ${issue.message}`)
+        .join(", ");
+      return next(new AppError(errMsgs, 400));
+    }
+    req.params = result.data;
+    next();
+  };
+}

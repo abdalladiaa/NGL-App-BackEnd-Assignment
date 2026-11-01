@@ -7,13 +7,9 @@ export async function sendMessage(messageData) {
 export async function getAllMessages(userId) {
   return await Message.find(
     { receiver: userId },
-    {},
-    {
-      populate: {
-        path: "sender",
-        select: "-password",
-        
-      },
-    },
-  );
+  ).select("-sender");
+}
+
+export async function getMessageById(id) {
+  return await Message.findById(id);
 }

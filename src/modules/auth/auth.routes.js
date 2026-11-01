@@ -1,7 +1,16 @@
 import { Router } from "express";
 import * as authController from "./auth.controller.js";
 import { validateBody } from "../../middlewares/validation.middleware.js";
-import { loginDto, logInWithGoogleDto, registerDto, resetPasswordDto, sendOtpDto, verifyAccountDto } from "./auth.dto.js";
+import {
+  enable2StepVerificationDto,
+  loginDto,
+  logInWithGoogleDto,
+  registerDto,
+  resetPasswordDto,
+  sendOtpDto,
+  verifyAccountDto,
+  verifyCodeToLoginDto,
+} from "./auth.dto.js";
 import { auth } from "../../middlewares/auth.middleware.js";
 import { TokenEnum } from "../../lib/enums/token.enum.js";
 import limiterMiddleWare from "../../middlewares/limiter.middleware.js";
@@ -19,7 +28,15 @@ authRouter.patch("/reset-password", validateBody(resetPasswordDto), authControll
 authRouter.post("/login-with-google",validateBody(logInWithGoogleDto), authController.loginWithGoogle);
 authRouter.post("/rotate-token" , auth(TokenEnum.REFRESH_TOKEN) , authController.rotateToken)
 authRouter.post('/logout' , auth(TokenEnum.REFRESH_TOKEN) , authController.logout)
-authRouter.patch('/active-two-step-verification' , authController.enable2StepVerification)
-authRouter.post('/verify-code-two-step-verification' , authController.verifyCodeToLogin)
+authRouter.patch(
+  "/active-two-step-verification",
+  validateBody(enable2StepVerificationDto),
+  authController.enable2StepVerification,
+);
+authRouter.post(
+  "/verify-code-two-step-verification",
+  validateBody(verifyCodeToLoginDto),
+  authController.verifyCodeToLogin,
+);
 
 export default authRouter;

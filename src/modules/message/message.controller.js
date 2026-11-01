@@ -25,8 +25,8 @@ export const getAllMessages = async (req, res, next) => {
   try {
     const userId = req.user?.id;
     const messages = await messageService.getAllMessages(userId);
-    if(messages.length === 0 ){
-      throw messageError.messagesNotFound()
+    if (messages.length === 0) {
+      throw messageError.messagesNotFound();
     }
     successResponse({
       res,

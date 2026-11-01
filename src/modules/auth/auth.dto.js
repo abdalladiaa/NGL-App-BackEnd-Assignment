@@ -25,6 +25,16 @@ export const verifyAccountDto = z.object({
   code: z.string().length(6).trim(),
 });
 
+export const enable2StepVerificationDto = z.object({
+  email: z.email().toLowerCase().trim(),
+  code: z.string().length(6).trim(),
+});
+
+export const verifyCodeToLoginDto = z.object({
+  email: z.email().toLowerCase().trim(),
+  code: z.string().length(6).trim(),
+});
+
 export const sendOtpDto = z.object({
   email: z.email().toLowerCase().trim(),
 });
